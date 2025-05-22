@@ -1,6 +1,8 @@
 module github.com/jamestunnell/marketdata
 
-go 1.21.0
+go 1.22
+
+toolchain go1.22.2
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
