@@ -22,10 +22,8 @@ type CollectCommand struct {
 	End, Start date.Date
 	Dir        string
 	Symbol     string
-	TimeZone   string
+	Location   *time.Location
 	Collector  BarCollector
-
-	loc *time.Location
 }
 
 var errEmptySymbol = errors.New("symbol is empty")
@@ -59,13 +57,6 @@ func (cmd *CollectCommand) Init() error {
 	if err := verifyDirExists(cmd.Dir); err != nil {
 		return err
 	}
-
-	loc, err := time.LoadLocation(cmd.TimeZone)
-	if err != nil {
-		return fmt.Errorf("failed to load location '%s': %w", cmd.TimeZone, err)
-	}
-
-	cmd.loc = loc
 
 	return nil
 }
@@ -125,16 +116,12 @@ func (cmd *CollectCommand) collect(fpath string, start, end date.Date) error {
 	defer f.Close()
 
 	startTime := time.Now()
-	ts := timespan.NewTimeSpan(start.In(cmd.loc), end.In(cmd.loc))
+	ts := timespan.NewTimeSpan(start.In(cmd.Location), end.In(cmd.Location))
 
 	var bars Bars
 
 	if bars, err = cmd.Collector.Collect(cmd.Symbol, ts); err != nil {
 		return fmt.Errorf("failed to load bars: %w", err)
-	}
-
-	for _, bar := range bars {
-		bar.Timestamp = bar.Timestamp.In(cmd.loc)
 	}
 
 	log.Info().

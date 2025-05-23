@@ -30,12 +30,17 @@ func main() {
 
 	startDate, err := date.Parse(date.RFC3339, *start)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to parse start date")
+		log.Fatal().Err(err).Str("startDate", *start).Msg("failed to parse start date")
 	}
 
 	endDate, err := date.Parse(date.RFC3339, *end)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to parse end date")
+		log.Fatal().Err(err).Str("endDate", *end).Msg("failed to parse end date")
+	}
+
+	loc, err := time.LoadLocation(*tz)
+	if err != nil {
+		log.Fatal().Err(err).Str("timeZone", *tz).Msg("failed to load location")
 	}
 
 	cmd := &marketdata.CollectCommand{
@@ -43,8 +48,8 @@ func main() {
 		End:       endDate,
 		Dir:       *dir,
 		Symbol:    *sym,
-		TimeZone:  *tz,
-		Collector: alpaca.NewFreeBarCollector(),
+		Location:  loc,
+		Collector: alpaca.NewFreeBarCollector(loc),
 	}
 
 	startTime := time.Now()

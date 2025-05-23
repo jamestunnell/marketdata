@@ -12,6 +12,7 @@ import (
 )
 
 func GetBarsOneMin(
+	client *marketdata.Client,
 	sym string,
 	ts timespan.TimeSpan,
 	loc *time.Location,
@@ -31,6 +32,11 @@ func GetBarsOneMin(
 		AsOf:      "-",
 	})
 	if err != nil {
+		log.Debug().Err(err).
+			Str("start", start.In(loc).Format(time.RFC3339)).
+			Str("end", end.In(loc).Format(time.RFC3339)).
+			Msg("failed to get bars from alpaca")
+
 		return md.Bars{}, fmt.Errorf("failed to get bars from alpaca: %w", err)
 	}
 
