@@ -23,6 +23,10 @@ func GetBarsOneMin(
 	latestEndAllowed := time.Now().Add(-(15*time.Minute + time.Second))
 	if end.After(latestEndAllowed) {
 		end = latestEndAllowed
+
+		if start.After(end) {
+			start = end
+		}
 	}
 
 	alpacaBars, err := marketdata.GetBars(sym, marketdata.GetBarsRequest{
